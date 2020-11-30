@@ -3,19 +3,12 @@ package mysql_test
 import (
 	"context"
 	"database/sql"
-	"github.com/stretchr/testify/assert"
 	"github.com/radical-app/go-mysql-tx"
-	"os"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func CreateDB(t *testing.T) (db *sql.DB, ctx context.Context) {
-
-	os.Setenv("TEST_DB_HOST","localhost")
-	os.Setenv("TEST_DB_NAME","test_db")
-	os.Setenv("TEST_DB_PASSWORD","qweuidewfnjewf8")
-	os.Setenv("TEST_DB_PORT","3306")
-	os.Setenv("TEST_DB_USER","root")
 
 	ctx = context.Background()
 

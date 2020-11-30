@@ -3,6 +3,8 @@ package mysql
 import (
 	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 const DEFAULT_CNN_FLAGS = "parseTime=true&multiStatements=true&loc=UTC&charset=utf8"
@@ -32,6 +34,8 @@ func ConfigFromEnvsWithCNNFlags(prefix string, flags string) *Config {
 		prefix = "BOOKING"
 	}
 	prefix = strings.ToUpper(strings.TrimRight(prefix, "_")+"_")
+
+	_ = godotenv.Load("./.env" )
 
 	return &Config{
 		os.Getenv(prefix + "DB_USER"),

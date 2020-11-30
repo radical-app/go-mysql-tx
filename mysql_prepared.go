@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
 )
@@ -33,8 +32,8 @@ func TxCreate(db *sql.DB, ctx context.Context) (*sql.Tx , error) {
 	return db.BeginTx(ctx, nil)
 }
 
-//Query Execution on Transaction
-func TxFetchRows(tx *sql.Tx, ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
+//Query Execution on Transaction by Prepared args (?,?)
+func TxFetchRowsPrepared(tx *sql.Tx, ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
 
 	if tx == nil {
 		return rows, errors.New("Empty transaction")
@@ -48,8 +47,8 @@ func TxFetchRows(tx *sql.Tx, ctx context.Context, query string, args ...interfac
 	return rows, err
 }
 
-//Query Execution on Transaction
-func TxPush(tx *sql.Tx, ctx context.Context, query string, args ...interface{}) (inc int64, err error) {
+//Query Execution on Transaction with Prepared args (?,?)
+func TxPushPrepared(tx *sql.Tx, ctx context.Context, query string, args ...interface{}) (inc int64, err error) {
 
 	if tx == nil {
 		return inc, errors.New("Empty transaction")
@@ -73,32 +72,29 @@ func IsErrorRollback(err error, tx *sql.Tx) bool {
 	return false
 }
 
-// FetchRows Is like TxCreate+TxFetchRows+tx.Commit in once
-func FetchRows(db *sql.DB, ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
+// FetchRowsPrepared Is like TxCreate+TxFetchRow Remember to run  Tx.Commit() or Tx.Rollback()
+func FetchRowsPrepared(db *sql.DB, ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, tx *sql.Tx, err error) {
 
-	tx, err := TxCreate(db, ctx)
+	tx, err = TxCreate(db, ctx)
 	if err!=nil {
-		return rows, err
+		return rows, tx, err
 	}
-	rows, err = TxFetchRows(tx, ctx, query, args...)
-	fmt.Print(err)
-	if err != nil {
-		return rows, err
+	rows, err = TxFetchRowsPrepared(tx, ctx, query, args...)
+ 	if err != nil {
+		return rows, tx , err
 	}
 
-	err = tx.Commit()
-
-	return rows, err
+	return rows, tx, err
 }
 
-// Push Is like  TxCreate+TxPush+tx.Commit  in once
-func Push(db *sql.DB, ctx context.Context, query string, args ...interface{}) (inc int64, err error) {
+// PushPrepared Is like  TxCreate+TxPush+tx.Commit  in once
+func PushPrepared(db *sql.DB, ctx context.Context, query string, args ...interface{}) (inc int64, err error) {
 
 	tx, err := TxCreate(db, ctx)
 	if err!=nil {
 		return inc, err
 	}
-	inc, err = TxPush(tx, ctx, query, args...)
+	inc, err = TxPushPrepared(tx, ctx, query, args...)
 	if err != nil {
 		return inc, err
 	}

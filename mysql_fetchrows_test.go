@@ -13,13 +13,13 @@ func TestPushAndFetchRows(t *testing.T) {
 
 	db, ctx := CreateDB(t)
 	//-----
-	i, err := mysql.Push(db, ctx, TEST_TABLE_INSERT, "new insert")
+	i, err := mysql.PushPrepared(db, ctx, TEST_TABLE_INSERT, "new insert")
 	assert.Nil(t, err)
 	assert.True(t, i>0)
 
 
 	//-----
-	rows, err := mysql.FetchRows(db, ctx, TEST_TABLE_SELECT, i)
+	rows, tx, err := mysql.FetchRowsPrepared(db, ctx, TEST_TABLE_SELECT, i)
 	assert.Nil(t, err)
 	count := 0
 	for rows.Next() {
@@ -33,7 +33,7 @@ func TestPushAndFetchRows(t *testing.T) {
 		assert.True(t, name != "")
 	}
 	assert.True(t, count > 0)
-
+	assert.Nil(t,tx.Commit())
 	// ---
 	DestroyDB(t, db, ctx)
 }

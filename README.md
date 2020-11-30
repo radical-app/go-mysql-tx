@@ -1,7 +1,8 @@
-# Golang Mysql transactions helper
+# Improving GoLang MySQL Developer experience
 
 Working with golang and mysql in the good way.
 
+- Named parameters on query 
 - Transactions are awesome tool for sql developers.
 - Context is an awesome tool for GO developers.
 
@@ -9,6 +10,10 @@ Working with golang and mysql in the good way.
 
 - Too slow.
 - Too complex.
+
+## Named parameters 
+
+- However there is an open issue for it for the mysql-driver: https://github.com/go-sql-driver/mysql/issues/561
 
 ### why not raw sql?
 
