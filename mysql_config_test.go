@@ -1,7 +1,8 @@
-package mysql
+package toolbox_test
 
 import (
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/radical-app/sql-fast-toolbox"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
@@ -22,7 +23,7 @@ func TestConfig_GetConnection(t *testing.T) {
 	err = os.Setenv(prefix + "DB_PORT", "3306")
 	assert.Nil(t, err)
 
-	c := ConfigFromEnvs(prefix)
+	c := toolbox.ConfigFromEnvs(prefix)
 
 	assert.Equal(t, "USER:PASSWORD@tcp(HOST:3306)/NAME?parseTime=true&multiStatements=true&loc=UTC&charset=utf8", c.GetConnection())
 }

@@ -1,8 +1,8 @@
-package mysql_test
+package toolbox_test
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/radical-app/go-mysql-dx"
+	"github.com/radical-app/sql-fast-toolbox"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,26 +13,26 @@ func TestOpenCommitRollbackSingle(t *testing.T) {
 	db, ctx := CreateDB(t)
 	//-----
 
-	tx, err := mysql.TxCreate(db, ctx)
+	tx, err := toolbox.TxCreate(db, ctx)
 	assert.Nil(t, err)
-	firstInc, err := mysql.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting data multiple commit")
+	firstInc, err := toolbox.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting data multiple commit")
 	assert.Nil(t, err)
 	assert.True(t, firstInc > 0)
 	assert.Nil(t, tx.Commit())
 	//-----
 
-	tx, err = mysql.TxCreate(db, ctx)
+	tx, err = toolbox.TxCreate(db, ctx)
 	assert.Nil(t, err)
-	inc, err := mysql.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting second data on same transaction and commit")
+	inc, err := toolbox.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting second data on same transaction and commit")
 	assert.Nil(t, err)
 	assert.True(t, inc > 0)
 	assert.Nil(t, tx.Commit())
 
 	//-----
 
-	tx, err = mysql.TxCreate(db, ctx)
+	tx, err = toolbox.TxCreate(db, ctx)
 	assert.Nil(t, err)
-	rows, err := mysql.TxFetchRowsPrepared(tx, ctx, TEST_TABLE_SELECT, firstInc)
+	rows, err := toolbox.TxFetchRowsPrepared(tx, ctx, TEST_TABLE_SELECT, firstInc)
 	assert.Nil(t, err)
 	assert.Nil(t, rows.Err())
 
@@ -61,47 +61,47 @@ func TestOpenCommitRollback(t *testing.T) {
 	db, ctx := CreateDB(t)
 	//-----
 
-	tx, err := mysql.TxCreate(db, ctx)
+	tx, err := toolbox.TxCreate(db, ctx)
 	assert.Nil(t, err)
-	firstInc, err := mysql.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting data multiple commit")
+	firstInc, err := toolbox.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting data multiple commit")
 	assert.Nil(t, err)
 	assert.True(t, firstInc > 0)
 	assert.Nil(t, tx.Commit())
 	//-----
 
-	tx, err = mysql.TxCreate(db, ctx)
+	tx, err = toolbox.TxCreate(db, ctx)
 	assert.Nil(t, err)
-	inc, err := mysql.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting second data on same transaction and commit")
-	assert.Nil(t, err)
-	assert.True(t, inc > 0)
-	assert.Nil(t, tx.Commit())
-
-	//-----
-
-	tx, err = mysql.TxCreate(db, ctx)
-	assert.Nil(t, err)
-	inc, err = mysql.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "Third insert on committed tx")
+	inc, err := toolbox.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "inserting second data on same transaction and commit")
 	assert.Nil(t, err)
 	assert.True(t, inc > 0)
 	assert.Nil(t, tx.Commit())
 
 	//-----
 
-	tx, err = mysql.TxCreate(db, ctx)
+	tx, err = toolbox.TxCreate(db, ctx)
 	assert.Nil(t, err)
-	inc, err = mysql.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "Fourth insert on committed tx then rollback and try to insert again")
+	inc, err = toolbox.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "Third insert on committed tx")
+	assert.Nil(t, err)
+	assert.True(t, inc > 0)
+	assert.Nil(t, tx.Commit())
+
+	//-----
+
+	tx, err = toolbox.TxCreate(db, ctx)
+	assert.Nil(t, err)
+	inc, err = toolbox.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "Fourth insert on committed tx then rollback and try to insert again")
 	assert.Nil(t, err)
 	assert.True(t, inc > 0)
 	assert.Nil(t, tx.Rollback())
 
-	inc, err = mysql.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "Should fail has been already roll-backed")
+	inc, err = toolbox.TxPushPrepared(tx, ctx, TEST_TABLE_INSERT, "Should fail has been already roll-backed")
 	assert.NotNil(t, tx.Commit())
 
 	//----- Select
 
-	tx, err = mysql.TxCreate(db, ctx)
+	tx, err = toolbox.TxCreate(db, ctx)
 	assert.Nil(t, err)
-	rows, err := mysql.TxFetchRowsPrepared(tx, ctx, TEST_TABLE_SELECT, firstInc)
+	rows, err := toolbox.TxFetchRowsPrepared(tx, ctx, TEST_TABLE_SELECT, firstInc)
 	assert.Nil(t, err)
 	assert.Nil(t, rows.Err())
 

@@ -1,4 +1,4 @@
-module github.com/radical-app/go-mysql-dx
+module github.com/radical-app/sql-fast-toolbox
 
 go 1.15
 
