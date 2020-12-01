@@ -4,12 +4,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"strings"
 	"testing"
 )
 
 func TestConfig_GetConnection(t *testing.T) {
 
-	prefix := "TEST_"
+	prefix := strings.ToUpper("TEST_"+t.Name()+"_")
 	err := os.Setenv(prefix + "DB_USER", "USER")
 	assert.Nil(t, err)
 	err = os.Setenv(prefix + "DB_PASSWORD", "PASSWORD")

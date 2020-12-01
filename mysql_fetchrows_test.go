@@ -1,8 +1,9 @@
 package mysql_test
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
-	"github.com/radical-app/go-mysql-tx"
+	"github.com/radical-app/go-mysql-dx"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -12,6 +13,7 @@ import (
 func TestPushAndFetchRows(t *testing.T) {
 
 	db, ctx := CreateDB(t)
+	fmt.Print(db, ctx)
 	//-----
 	i, err := mysql.PushPrepared(db, ctx, TEST_TABLE_INSERT, "new insert")
 	assert.Nil(t, err)

@@ -2,7 +2,7 @@ package mysql_test
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/radical-app/go-mysql-tx"
+	"github.com/radical-app/go-mysql-dx"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"

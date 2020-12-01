@@ -1,4 +1,4 @@
-module github.com/radical-app/go-mysql-tx
+module github.com/radical-app/go-mysql-dx
 
 go 1.15
 

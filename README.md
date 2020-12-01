@@ -1,63 +1,55 @@
-# Improving GoLang MySQL Developer experience
+# Golang SQL fast toolbox
+### Named parameters, Transactions and Context
 
-Working with golang and mysql in the good way.
-
-- Named parameters on query 
-- Transactions are awesome tool for sql developers.
-- Context is an awesome tool for GO developers.
-
-### Why not an orm?
-
-- Too slow.
-- Too complex.
+- Faster *named parameters*, no reflection!
+- Simpler consistency - *Transactions* always commit or rollback! 
+- SQL with *Context*, you should prevent edge problems.
+- Improving Developer experience enforncing Good practices.
 
 ## Named parameters 
 
-- However there is an open issue for it for the mysql-driver: https://github.com/go-sql-driver/mysql/issues/561
+```go
+    FetchRows(db, ctx, "SELECT me FROM devs WHERE skills = :skill AND yeart = :year;", Named{"skill": skill, "year": 30}
+```
+This fix: `https://github.com/go-sql-driver/mysql/issues/561`
 
-### why not raw sql?
+## Single or Multiple Transaction in stashed environment 
 
-- Developer experience is poor.
-- `sql` module does not enforce good practices.
+```go
+// main.go
+c := mysql.ConfigFromEnvs("TEST") 
 
-### 0 configure vars 
-    
+db, err := mysql.Open(c, ctx)
+if err != nil {
+      // do smtg clever 
+}
+//db.SetMaxLifetimeMins(15) optional set it
+```
 
-    
-### The flow
+```go
+// in repo.go
+// ctx = context.Background() or reuse the ctx from the request/response framework
+tx, err := mysql.TxCreate(db, ctx) 
+if mysql.IsErrorRollback(err, tx) {
+    //do smtg clever, tx is already rollbacked
+}
 
-    // the main
-    c := mysql.ConfigFromEnvs("TEST") 
-    
-    db, err := mysql.Open(c, ctx)
-    if err != nil {
-          // do smtg clever 
-    }
-    //db.SetMaxLifetimeMins(15)
-  
-    // usually in the request/response ctx 
-    // ctx := context.Background()
-    tx, err := mysql.TxCreate(db, ctx)
-    if mysql.IsErrorRollback(err, tx) {
-        // do smtg clever 
-    }
-   
-    incremental, err := mysql.TxPush(tx, ctx, "insert into MYDB (name) values (?)", "namearg")
-    if mysql.IsErrorRollback(err, tx) {
-        // do smtg clever is already rollbacked
-    }
-    fmt.Print(incremental)
-    // -----
-    // multiple insert on single transaction
-    // -----
-    incremental, err := mysql.TxPush(tx, ctx, "insert into MYDB (name) values (?)", "namearg2")
-    if mysql.IsErrorRollback(err, tx) {
-        // do smtg clever is already rollbacked
-    }
-    fmt.Print(incremental)
-    err = tx.Commit()
-    if err != nil {
-        // do smtg clever 
-    }
-  
+// start using the transaction
+
+incrementalOId, err := mysql.TxPush(tx, ctx, "insert into `order` (name) values (:name)", mysql.Named{"name": "value to insert"})
+if mysql.IsErrorRollback(err, tx) {
+    // do smtg clever is already rollbacked
+}
+
+incrementalIId, err := mysql.TxPush(tx, ctx, "insert into `item` (order_id) values (:order_id)", mysql.Named{"order_id": incrementalOId})
+if mysql.IsErrorRollback(err, tx) {
+    // do smtg clever is already rollbacked
+}
+
+if tx.Commit() != nil {
+	 // do smtg clever
+}
+```
+
+ 
   

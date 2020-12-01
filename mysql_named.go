@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-
+type Named map[string]interface{}
 
 //Query Execution on Transaction
 func TxFetchRows(tx *sql.Tx, ctx context.Context, query string, args map[string]interface{}) (rows *sql.Rows, err error) {
