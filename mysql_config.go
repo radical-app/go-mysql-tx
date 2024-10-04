@@ -26,6 +26,14 @@ func ConfigFromEnvs(prefix string) *Config {
 	return ConfigFromEnvsWithCNNFlags(prefix, DEFAULT_CNN_FLAGS)
 }
 
+func ConfigFromEnvsReadOnly(prefix string) *Config {
+	cnf := ConfigFromEnvsWithCNNFlags(prefix, DEFAULT_CNN_FLAGS)
+	cnf.Host = os.Getenv(prefix + "_DB_HOST_RO")
+	if cnf.Host == "" {
+		return nil
+	}
+	return cnf
+}
 
 func ConfigFromEnvsWithCNNFlags(prefix string, flags string) *Config {
 	if prefix == "" {
